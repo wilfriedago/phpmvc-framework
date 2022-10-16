@@ -1,0 +1,11 @@
+{
+  "name": "phpmvc-framework",
+  "version": "1.0.0",
+  "description": "Simple PHP MVC Framework using PDO & OOP",
+  "main": "",
+  "scripts": {},
+  "keywords": [],
+  "author": "Wilfried AGO <wilfriedago@pm.me>",
+  "license": "MIT",
+  "devDependencies": {}
+}
