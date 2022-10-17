@@ -1,11 +1,18 @@
 {
-  "name": "phpmvc-framework",
-  "version": "1.0.0",
-  "description": "Simple PHP MVC Framework using PDO & OOP",
-  "main": "",
-  "scripts": {},
-  "keywords": [],
-  "author": "Wilfried AGO <wilfriedago@pm.me>",
-  "license": "MIT",
-  "devDependencies": {}
+	"name": "phpmvc-framework",
+	"version": "1.0.0",
+	"description": "Simple PHP MVC Framework using PDO & OOP",
+	"main": "",
+	"scripts": {
+		"serve": "php -S localhost:8080 -t public",
+		"dump-autoload": "composer dump-autoload -o"
+	},
+	"keywords": [],
+	"author": "Wilfried AGO <wilfriedago@pm.me>",
+	"license": "MIT",
+	"devDependencies": {
+		"autoprefixer": "^10.4.12",
+		"postcss": "^8.4.18",
+		"tailwindcss": "^3.1.8"
+	}
 }
