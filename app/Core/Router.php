@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-use App\Core\Request;
+use App\Exceptions\RouteNotFoundException;
 
 /**
  * Class Router
@@ -15,13 +15,9 @@ use App\Core\Request;
 class Router
 {
     /**
-     * List of all routes
-     *
-     * @var array $routes
+     * List of all Application ROUTES
      */
-    protected array $routes = [];
-
-    public Request $request;
+    public static array $ROUTES = [];
 
     public function __construct()
     {
@@ -30,34 +26,47 @@ class Router
     /**
      * Handle a Route Registration
      *
-     * @param string    $method   Http method
-     * @param string    $uri      Http uri
-     * @param callable  $callback Callback function
+     * @param string $method Http method
+     * @param string $uri Http uri
+     * @param callable $callback Callback function
      * @return void
      */
-    private function handle(string $method, string $uri, callable $callback): void
+    private static function handle(string $method, string $uri, callable $callback): void
     {
-        $this->routes[$method][$uri] = $callback;
+        self::$ROUTES[$method][$uri] = $callback;
     }
 
-    private function resolve(): callable | null
+    /**
+     * Resolve new Route
+     *
+     * @param Request $request
+     * @return mixed
+     * @throws RouteNotFoundException
+     */
+    public function resolve(Request $request): mixed
     {
-        $method = $this->request->getMethod();
-        $uri = $this->request->getUri();
-        return $this->routes[$method][$uri] ?? null;
+        $method = $request->getMethod();
+        $uri = $request->getUri();
+        $action = self::$ROUTES[$method][$uri] ?? null;
+
+        if (!$action) {
+            throw new RouteNotFoundException();
+        }
+
+        return call_user_func($action);
     }
 
     /**
      * Register a new GET route
      *
-     * @param string $path Route path string
-     * @param callable $callback Callable function after resolve
+     * @param string $path
+     * @param callable $callback
      * @return self
      */
-    public function get(string $path, callable $callback): self
+    public static function get(string $path, callable $callback): self
     {
-        $this->handle('GET', $path, $callback);
-        return $this;
+        self::handle('GET', $path, $callback);
+        return new static();
     }
 
     /**
@@ -67,10 +76,10 @@ class Router
      * @param callable $callback
      * @return self
      */
-    public function post(string $path, callable $callback): self
+    public static function post(string $path, callable $callback): self
     {
-        $this->handle('POST', $path, $callback);
-        return $this;
+        self::handle('POST', $path, $callback);
+        return new static();
     }
 
     /**
@@ -80,10 +89,10 @@ class Router
      * @param callable $callback
      * @return self
      */
-    public function put(string $path, callable $callback): self
+    public static function put(string $path, callable $callback): self
     {
-        $this->handle('PUT', $path, $callback);
-        return $this;
+        self::handle('PUT', $path, $callback);
+        return new static();
     }
 
     /**
@@ -93,10 +102,10 @@ class Router
      * @param callable $callback
      * @return self
      */
-    public function delete(string $path, callable $callback): self
+    public static function delete(string $path, callable $callback): self
     {
-        $this->handle('DELETE', $path, $callback);
-        return $this;
+        self::handle('DELETE', $path, $callback);
+        return new static();
     }
 
     /**
@@ -106,19 +115,23 @@ class Router
      * @param callable $callback
      * @return self
      */
-    public function patch(string $path, callable $callback): self
+    public static function patch(string $path, callable $callback): self
     {
-        $this->handle('PATCH', $path, $callback);
-        return $this;
+        self::handle('PATCH', $path, $callback);
+        return new static();
     }
 
-    public function prefix(): self
+    /**
+     * @param string $path
+     * @return static
+     */
+    public static function prefix(string $path): self
     {
-        return $this;
+        return new static();
     }
 
     public function middleware(): self
     {
-        return $this;
+        return new static();
     }
 }
