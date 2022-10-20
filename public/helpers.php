@@ -15,9 +15,9 @@ const VITE_HOST = 'http://localhost:5133';
 
 function vite(string $entry): string
 {
-    return "\n" . jsTag($entry)
-        . "\n" . jsPreloadImports($entry)
-        . "\n" . cssTag($entry);
+    return jsTag($entry)
+        . "\n\t" . jsPreloadImports($entry)
+        . "\n\t" . cssTag($entry) . "\n";
 }
 
 
@@ -48,18 +48,19 @@ function isDev(string $entry): bool
 
 // Helpers to print tags
 
+/**
+ * @param string $entry
+ * @return string
+ */
 function jsTag(string $entry): string
 {
-    $url = isDev($entry)
-        ? VITE_HOST . '/' . $entry
-        : assetUrl($entry);
+    $url = isDev($entry) ? VITE_HOST . '/' . $entry : assetUrl($entry);
 
     if (!$url) {
         return '';
     }
-    return '<script type="module" crossorigin src="'
-        . $url
-        . '"></script>';
+
+    return '<script defer type="module" crossorigin src="' . $url . '"></script>';
 }
 
 function jsPreloadImports(string $entry): string
@@ -70,9 +71,7 @@ function jsPreloadImports(string $entry): string
 
     $res = '';
     foreach (importsUrls($entry) as $url) {
-        $res .= '<link rel="modulepreload" href="'
-            . $url
-            . '">';
+        $res .= '<link rel="modulepreload" href="' . $url . '">';
     }
     return $res;
 }
@@ -85,32 +84,40 @@ function cssTag(string $entry): string
     }
 
     $tags = '';
+
     foreach (cssUrls($entry) as $url) {
-        $tags .= '<link rel="stylesheet" href="'
-            . $url
-            . '">';
+        $tags .= '<link rel="stylesheet" href="' . $url . '">';
     }
+
     return $tags;
 }
 
 
 // Helpers to locate files
 
+/**
+ * @return array
+ */
 function getManifest(): array
 {
     $content = file_get_contents(__DIR__ . '/dist/manifest.json');
     return json_decode($content, true);
 }
 
+/**
+ * @param string $entry
+ * @return string
+ */
 function assetUrl(string $entry): string
 {
     $manifest = getManifest();
-
-    return isset($manifest[$entry])
-        ? '/dist/' . $manifest[$entry]['file']
-        : '';
+    return isset($manifest[$entry]) ? '/dist/' . $manifest[$entry]['file'] : '';
 }
 
+/**
+ * @param string $entry
+ * @return array
+ */
 function importsUrls(string $entry): array
 {
     $urls = [];
@@ -124,6 +131,10 @@ function importsUrls(string $entry): array
     return $urls;
 }
 
+/**
+ * @param string $entry
+ * @return array
+ */
 function cssUrls(string $entry): array
 {
     $urls = [];
