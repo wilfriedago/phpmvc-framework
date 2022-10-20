@@ -18,11 +18,16 @@ use App\Exceptions\RouteNotFoundException;
 class Application
 {
     public static string $ROOT_DIR;
+    public Router $router;
+    public Request $request;
+    public Response $response;
 
-    public function __construct()
+    public function __construct($rootDir)
     {
-        self::$ROOT_DIR = dirname(__DIR__);
-        $this->enableRouting();
+        self::$ROOT_DIR = $rootDir;
+        $this->router = new Router();
+        $this->request = new Request();
+        $this->response = new Response();
     }
 
     /**
@@ -32,21 +37,9 @@ class Application
      */
     public function run(): void
     {
-        $request = $this->getRequest();
-        $response = $this->getResponse($request);
-        $response->send();
-    }
-
-    /**
-     * @return void
-     */
-    private function enableRouting(): void
-    {
-        try {
-            echo (new Router())->resolve($this->getRequest());
-        } catch (RouteNotFoundException $e) {
-            echo $e->getMessage();
-        }
+        $this->request = $this->getRequest();
+        $this->response = $this->getResponse($this->request);
+        $this->response->send();
     }
 
     /**
@@ -72,15 +65,14 @@ class Application
      */
     private function getResponse(Request $request): Response
     {
-        $uri = $request->getUri();
-        $method = $request->getMethod();
-
-        if (!isset($this->routes[$method][$uri])) {
-            return new Response(404, 'Not Found');
+        try {
+            $response = $this->router->resolve($request);
+        } catch (RouteNotFoundException $e) {
+            $response = $this->response
+                ->setBody($e->view)
+                ->setStatus(404);
         }
 
-        $controller = $this->routes[$method][$uri];
-
-        return $controller($request);
+        return $response;
     }
 }

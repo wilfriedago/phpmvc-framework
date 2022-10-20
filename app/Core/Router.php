@@ -24,46 +24,108 @@ class Router
     }
 
     /**
+     * Resolve new Route
+     *
+     * @param Request $request
+     * @return Response
+     * @throws RouteNotFoundException
+     */
+    public function resolve(Request $request): Response
+    {
+        $method = $request->getMethod();
+        $uri = $request->getUri();
+        $callback = self::$ROUTES[$method][$uri] ?? null;
+
+        if (!$callback) {
+            throw new RouteNotFoundException(view: $this->renderViewWithLayout("404"));
+        }
+
+        $responseAction = call_user_func($callback);
+
+        $responseBody = $this->renderViewWithLayout($responseAction);
+
+        return new Response(body:call_user_func($callback));
+    }
+
+    /**
+     * @param array $callbackArray
+     * @return mixed|void
+     */
+    public static function resolveCallbackFromArray(array $callbackArray)
+    {
+        [$controllerClass, $controllerMethod] = $callbackArray;
+
+        if (class_exists($controllerClass)) {
+            $controllerClass = new $controllerClass();
+
+            if (method_exists($controllerClass, $controllerMethod)) {
+                if (is_callable($controllerMethod)) {
+                    return call_user_func_array([$controllerClass, $controllerMethod], []);
+                }
+            }
+        }
+    }
+
+    /**
      * Handle a Route Registration
      *
      * @param string $method Http method
      * @param string $uri Http uri
-     * @param callable $callback Callback function
+     * @param callable|array $callback Callback function
      * @return void
      */
-    private static function handle(string $method, string $uri, callable $callback): void
+    private static function handle(string $method, string $uri, callable|array $callback): void
     {
-        self::$ROUTES[$method][$uri] = $callback;
+        if (is_callable($callback)) {
+            self::$ROUTES[$method][$uri] = $callback;
+        }
+
+        if (is_array($callback)) {
+            self::$ROUTES[$method][$uri] = self::resolveCallbackFromArray($callback);
+        }
     }
 
     /**
-     * Resolve new Route
-     *
-     * @param Request $request
-     * @return mixed
-     * @throws RouteNotFoundException
+     * @param string $view
+     * @return string
      */
-    public function resolve(Request $request): mixed
+    public function renderView(string $view): string
     {
-        $method = $request->getMethod();
-        $uri = $request->getUri();
-        $action = self::$ROUTES[$method][$uri] ?? null;
+        ob_start();
+        include_once Application::$ROOT_DIR . "/views/$view.php";
+        return ob_get_clean();
+    }
 
-        if (!$action) {
-            throw new RouteNotFoundException();
-        }
+    /**
+     * @param string $layout
+     * @return string
+     */
+    public function renderLayout(string $layout = 'main'): string
+    {
+        ob_start();
+        include_once Application::$ROOT_DIR . "/views/layouts/$layout.php";
+        return ob_get_clean();
+    }
 
-        return call_user_func($action);
+    /**
+     * @param string $view
+     * @return string
+     */
+    public function renderViewWithLayout(string $view) : string
+    {
+        $layout = $this->renderLayout();
+        $viewContent = $this->renderView($view);
+        return str_replace('{{content}}', $viewContent, $layout);
     }
 
     /**
      * Register a new GET route
      *
      * @param string $path
-     * @param callable $callback
+     * @param callable|array $callback
      * @return self
      */
-    public static function get(string $path, callable $callback): self
+    public static function get(string $path, callable|array $callback): self
     {
         self::handle('GET', $path, $callback);
         return new static();
@@ -73,10 +135,10 @@ class Router
      * Register a new POST route
      *
      * @param string $path
-     * @param callable $callback
+     * @param callable|array $callback
      * @return self
      */
-    public static function post(string $path, callable $callback): self
+    public static function post(string $path, callable|array $callback): self
     {
         self::handle('POST', $path, $callback);
         return new static();
@@ -86,10 +148,10 @@ class Router
      * Register a new PUT route
      *
      * @param string $path
-     * @param callable $callback
+     * @param callable|array $callback
      * @return self
      */
-    public static function put(string $path, callable $callback): self
+    public static function put(string $path, callable|array $callback): self
     {
         self::handle('PUT', $path, $callback);
         return new static();
@@ -99,10 +161,10 @@ class Router
      * Register a new DELETE route
      *
      * @param string $path
-     * @param callable $callback
+     * @param callable|array $callback
      * @return self
      */
-    public static function delete(string $path, callable $callback): self
+    public static function delete(string $path, callable|array $callback): self
     {
         self::handle('DELETE', $path, $callback);
         return new static();
@@ -112,10 +174,10 @@ class Router
      * Register a new PATCH route
      *
      * @param string $path
-     * @param callable $callback
+     * @param callable|array $callback
      * @return self
      */
-    public static function patch(string $path, callable $callback): self
+    public static function patch(string $path, callable|array $callback): self
     {
         self::handle('PATCH', $path, $callback);
         return new static();
@@ -130,6 +192,9 @@ class Router
         return new static();
     }
 
+    /**
+     * @return $this
+     */
     public function middleware(): self
     {
         return new static();

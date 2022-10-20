@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace App\Core;
 
+/**
+ * Class Request
+ *
+ * @category Class
+ * @package  App\Core
+ */
 class Request
 {
 
@@ -16,8 +22,8 @@ class Request
      * @param array  $body    Request Body
      */
     public function __construct(
-        private string $method,
-        private string $uri,
+        private string $method = "",
+        private string $uri = "",
         private array $headers = [],
         private array $body = []
     ) {
