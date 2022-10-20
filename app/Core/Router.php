@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
+use App\Core\View;
 use App\Exceptions\RouteNotFoundException;
 
 /**
@@ -37,21 +38,17 @@ class Router
         $callback = self::$ROUTES[$method][$uri] ?? null;
 
         if (!$callback) {
-            throw new RouteNotFoundException(view: $this->renderViewWithLayout("404"));
+            throw new RouteNotFoundException(view: View::renderWithLayout("404"));
         }
-
-        $responseAction = call_user_func($callback);
-
-        $responseBody = $this->renderViewWithLayout($responseAction);
 
         return new Response(body:call_user_func($callback));
     }
 
     /**
      * @param array $callbackArray
-     * @return mixed|void
+     * @return array
      */
-    public static function resolveCallbackFromArray(array $callbackArray)
+    public static function resolveCallbackFromArray(array $callbackArray):array
     {
         [$controllerClass, $controllerMethod] = $callbackArray;
 
@@ -59,9 +56,7 @@ class Router
             $controllerClass = new $controllerClass();
 
             if (method_exists($controllerClass, $controllerMethod)) {
-                if (is_callable($controllerMethod)) {
-                    return call_user_func_array([$controllerClass, $controllerMethod], []);
-                }
+                return [$controllerClass, $controllerMethod];
             }
         }
     }
@@ -83,39 +78,6 @@ class Router
         if (is_array($callback)) {
             self::$ROUTES[$method][$uri] = self::resolveCallbackFromArray($callback);
         }
-    }
-
-    /**
-     * @param string $view
-     * @return string
-     */
-    public function renderView(string $view): string
-    {
-        ob_start();
-        include_once Application::$ROOT_DIR . "/views/$view.php";
-        return ob_get_clean();
-    }
-
-    /**
-     * @param string $layout
-     * @return string
-     */
-    public function renderLayout(string $layout = 'main'): string
-    {
-        ob_start();
-        include_once Application::$ROOT_DIR . "/views/layouts/$layout.php";
-        return ob_get_clean();
-    }
-
-    /**
-     * @param string $view
-     * @return string
-     */
-    public function renderViewWithLayout(string $view) : string
-    {
-        $layout = $this->renderLayout();
-        $viewContent = $this->renderView($view);
-        return str_replace('{{content}}', $viewContent, $layout);
     }
 
     /**
