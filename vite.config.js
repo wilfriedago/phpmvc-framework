@@ -1,5 +1,6 @@
 /** @type {import('vite').UserConfig} */
 import { defineConfig } from 'vite';
+import liveReload from 'vite-plugin-live-reload';
 
 export default defineConfig({
     build: {
@@ -12,6 +13,5 @@ export default defineConfig({
 
     publicDir: false,
 
-    plugins: [
-    ]
+    plugins: [liveReload(['views/**/*.php', 'public/*.php'])]
     });

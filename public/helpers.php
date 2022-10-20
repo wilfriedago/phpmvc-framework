@@ -1,6 +1,6 @@
 <?php
 // Helpers here serve as example. Change to suit your needs.
-const VITE_HOST = 'http://localhost:5133';
+const VITE_HOST = 'http://127.0.0.1:5173';
 
 // For a real-world example check here:
 // https://github.com/wp-bond/bond/blob/master/src/Tooling/Vite.php
@@ -13,6 +13,10 @@ const VITE_HOST = 'http://localhost:5133';
 
 // Prints all the html entries needed for Vite
 
+/**
+ * @param string $entry
+ * @return string
+ */
 function vite(string $entry): string
 {
     return jsTag($entry)
@@ -20,9 +24,12 @@ function vite(string $entry): string
         . "\n\t" . cssTag($entry) . "\n";
 }
 
-
 // Some dev/prod mechanism would exist in your project
 
+/**
+ * @param string $entry
+ * @return bool
+ */
 function isDev(string $entry): bool
 {
     // This method is very useful for the local server
@@ -45,7 +52,6 @@ function isDev(string $entry): bool
     return $exists = !$error;
 }
 
-
 // Helpers to print tags
 
 /**
@@ -63,6 +69,10 @@ function jsTag(string $entry): string
     return '<script defer type="module" crossorigin src="' . $url . '"></script>';
 }
 
+/**
+ * @param string $entry
+ * @return string
+ */
 function jsPreloadImports(string $entry): string
 {
     if (isDev($entry)) {
@@ -76,6 +86,10 @@ function jsPreloadImports(string $entry): string
     return $res;
 }
 
+/**
+ * @param string $entry
+ * @return string
+ */
 function cssTag(string $entry): string
 {
     // not needed on dev, it's inject by Vite
@@ -91,7 +105,6 @@ function cssTag(string $entry): string
 
     return $tags;
 }
-
 
 // Helpers to locate files
 
