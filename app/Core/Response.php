@@ -16,18 +16,24 @@ class Response
     /**
      * @var int
      */
-    private int $status = 200;
+    private int $status;
     /**
      * @var string
      */
-    private string $body = "";
+    private string $body;
     /**
      * @var array|string[]
      */
-    private array $headers = ["Content-type" => 'text/html; charset=UTF-8'];
+    private array $headers;
 
-    public function __construct(int $status, string $body, array $headers)
-    {
+    public function __construct(
+        int $status = 200,
+        string $body = "",
+        array $headers = ["Content-type" => 'text/html; charset=UTF-8']
+    ) {
+        $this->status = $status;
+        $this->body = $body;
+        $this->headers = $headers;
     }
 
     /**
