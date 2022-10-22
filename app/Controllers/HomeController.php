@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Core\View;
+use App\Core\Controller;
 
-class HomeController
+class HomeController extends Controller
 {
     public function index(): string
     {
-        return View::renderWithLayout("home");
+        return $this->render("home");
     }
 }
