@@ -48,6 +48,16 @@ class Request
         return $this->method;
     }
 
+    public function isGet():bool
+    {
+        return $this->method === 'GET';
+    }
+
+    public function isPost():bool
+    {
+        return $this->method === 'POST';
+    }
+
     /**
      * Get the value of uri used by the Request
      *
