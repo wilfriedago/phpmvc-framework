@@ -34,12 +34,13 @@ class View
 
     /**
      * @param string $view
+     * @param string $layout
      * @param array $params
      * @return string
      */
-    public static function renderWithLayout(string $view, array $params = []) : string
+    public static function renderWithLayout(string $view, string $layout, array $params = []) : string
     {
-        $layout = self::renderLayout();
+        $layout = self::renderLayout($layout);
         $viewContent = self::render($view, $params);
         return str_replace('{{content}}', $viewContent, $layout);
     }

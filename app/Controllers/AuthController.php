@@ -12,7 +12,7 @@ class AuthController extends Controller
         if ($request->isPost()) {
             return "Submitted data";
         }
-        return self::render('login');
+        return $this->setLayout('auth')->render('login');
     }
 
     public function register(Request $request):string
@@ -20,6 +20,6 @@ class AuthController extends Controller
         if ($request->isPost()) {
             return "Submitted data";
         }
-        return self::render('register');
+        return $this->setLayout('auth')->render('register');
     }
 }

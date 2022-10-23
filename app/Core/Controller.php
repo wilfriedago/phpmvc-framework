@@ -4,8 +4,16 @@ namespace App\Core;
 
 class Controller
 {
-    protected static function render(string $view, array $params = []): string
+    public string $layout = 'main';
+
+    protected function render(string $view, array $params = []): string
     {
-        return View::renderWithLayout($view, $params);
+        return View::renderWithLayout($view, $this->layout, $params);
+    }
+
+    protected function setLayout(string $layout):Controller
+    {
+        $this->layout = $layout;
+        return $this;
     }
 }
