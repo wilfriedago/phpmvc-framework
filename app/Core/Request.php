@@ -13,10 +13,10 @@ namespace App\Core;
 class Request
 {
 
-    private string $method;
-    private string $uri;
-    private array $headers;
-    private array $body;
+    public string $method;
+    public string $uri;
+    public array $headers;
+    public array $body;
 
     /**
      * Class Request Constructor

@@ -16,15 +16,15 @@ class Response
     /**
      * @var int
      */
-    private int $status;
+    public int $status;
     /**
      * @var string
      */
-    private string $body;
+    public string $body;
     /**
      * @var array|string[]
      */
-    private array $headers;
+    public array $headers;
 
     public function __construct(
         int $status = 200,
