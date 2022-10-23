@@ -13,6 +13,11 @@ namespace App\Core;
 class Request
 {
 
+    private string $method;
+    private string $uri;
+    private array $headers;
+    private array $body;
+
     /**
      * Class Request Constructor
      *
@@ -22,11 +27,15 @@ class Request
      * @param array  $body    Request Body
      */
     public function __construct(
-        private string $method = "",
-        private string $uri = "",
-        private array $headers = [],
-        private array $body = []
+        string $method = "",
+        string $uri = "",
+        array $headers = [],
+        array $body = []
     ) {
+        $this->method = $method;
+        $this->uri = $uri;
+        $this->headers = $headers;
+        $this->body = $body;
     }
 
     /**
@@ -56,7 +65,7 @@ class Request
      * @return array
      */
     // FIXME : Get the parameters of the request
-    public function getParams(): array
+    public function getQuery(): array
     {
         return [];
     }
@@ -79,6 +88,19 @@ class Request
     // FIXME : Get the body of the request
     public function getBody(): array
     {
+
+        if ($this->method === 'GET') {
+            foreach ($_GET as $key => $value) {
+                $this->body[$key] = filter_input(INPUT_GET, $key, FILTER_SANITIZE_SPECIAL_CHARS);
+            }
+        }
+
+        if ($this->method === 'POST') {
+            foreach ($_POST as $key => $value) {
+                $this->body[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_SPECIAL_CHARS);
+            }
+        }
+
         return $this->body;
     }
 

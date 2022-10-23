@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-use App\Core\View;
 use App\Exceptions\RouteNotFoundException;
 
 /**
@@ -25,40 +24,16 @@ class Router
     }
 
     /**
-     * Resolve new Route
+     * Register a new GET route
      *
-     * @param Request $request
-     * @return Response
-     * @throws RouteNotFoundException
+     * @param string $path
+     * @param callable|array $callback
+     * @return self
      */
-    public function resolve(Request $request): Response
+    public static function get(string $path, callable|array $callback): self
     {
-        $method = $request->getMethod();
-        $uri = $request->getUri();
-        $callback = self::$ROUTES[$method][$uri] ?? null;
-
-        if (!$callback) {
-            throw new RouteNotFoundException(view: View::renderWithLayout("404"));
-        }
-
-        return new Response(body:call_user_func($callback));
-    }
-
-    /**
-     * @param array $callbackArray
-     * @return array
-     */
-    public static function resolveCallbackFromArray(array $callbackArray):array
-    {
-        [$controllerClass, $controllerMethod] = $callbackArray;
-
-        if (class_exists($controllerClass)) {
-            $controllerClass = new $controllerClass();
-
-            if (method_exists($controllerClass, $controllerMethod)) {
-                return [$controllerClass, $controllerMethod];
-            }
-        }
+        self::handle('GET', $path, $callback);
+        return new static();
     }
 
     /**
@@ -81,16 +56,20 @@ class Router
     }
 
     /**
-     * Register a new GET route
-     *
-     * @param string $path
-     * @param callable|array $callback
-     * @return self
+     * @param array $callbackArray
+     * @return array
      */
-    public static function get(string $path, callable|array $callback): self
+    public static function resolveCallbackFromArray(array $callbackArray): array
     {
-        self::handle('GET', $path, $callback);
-        return new static();
+        [$controllerClass, $controllerMethod] = $callbackArray;
+
+        if (class_exists($controllerClass)) {
+            $controllerClass = new $controllerClass();
+
+            if (method_exists($controllerClass, $controllerMethod)) {
+                return [$controllerClass, $controllerMethod];
+            }
+        }
     }
 
     /**
@@ -152,6 +131,26 @@ class Router
     public static function prefix(string $path): self
     {
         return new static();
+    }
+
+    /**
+     * Resolve new Route
+     *
+     * @param Request $request
+     * @return Response
+     * @throws RouteNotFoundException
+     */
+    public function resolve(Request $request): Response
+    {
+        $method = $request->getMethod();
+        $uri = $request->getUri();
+        $callback = self::$ROUTES[$method][$uri] ?? null;
+
+        if (!$callback) {
+            throw new RouteNotFoundException(view: View::renderWithLayout("404"));
+        }
+
+        return new Response(body: call_user_func($callback, $request));
     }
 
     /**
