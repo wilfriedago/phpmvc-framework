@@ -10,6 +10,9 @@ class HomeController extends Controller
 {
     public function index(): string
     {
-        return $this->render("home");
+        $params = [
+            'name' => 'TheWlabs '
+        ];
+        return $this->render("home", $params );
     }
 }
