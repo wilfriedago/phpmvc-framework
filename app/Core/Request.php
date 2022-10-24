@@ -95,7 +95,6 @@ class Request
      *
      * @return array
      */
-    // FIXME : Get the body of the request
     public function getBody(): array
     {
 

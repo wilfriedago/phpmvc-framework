@@ -88,7 +88,7 @@ class Response
      * @param array $data
      * @return self
      */
-    public function json(array $data): self
+    public function json(array $data): Response
     {
         $this->headers['Content-type'] = 'application/json';
         $this->body = json_encode($data);
@@ -101,7 +101,7 @@ class Response
      * @param string $url
      * @return self
      */
-    public function redirect(string $url): self
+    public function redirect(string $url): Response
     {
         $this->status = 301;
         $this->headers['Location'] = $url;

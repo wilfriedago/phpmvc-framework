@@ -67,10 +67,8 @@ class Application
     {
         try {
             $response = $this->router->resolve($request);
-        } catch (RouteNotFoundException $e) {
-            $response = $this->response
-                ->setBody($e->view)
-                ->setStatus(404);
+        } catch (RouteNotFoundException $error) {
+            $response = $this->response->setBody($error->view)->setStatus(404);
         }
 
         return $response;
