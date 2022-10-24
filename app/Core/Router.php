@@ -150,7 +150,9 @@ class Router
             throw new RouteNotFoundException(view: View::renderWithLayout("404"));
         }
 
-        return new Response(body: call_user_func($callback, $request));
+        $callbackResponse = call_user_func($callback, $request);
+
+        return ($callbackResponse instanceof Response) ? $callbackResponse : new Response(body: $callbackResponse);
     }
 
     /**
