@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use App\Core\View;
 use Exception;
 use Throwable;
 
@@ -12,10 +13,10 @@ class RouteNotFoundException extends Exception
      */
     public string $view;
 
-    public function __construct(string $message = "", int $code = 0, ?Throwable $previous = null, string $view = "")
+    public function __construct(string $message = "", int $code = 0, ?Throwable $previous = null, string $view = "404")
     {
         parent::__construct($message, $code, $previous);
 
-        $this->view = $view;
+        $this->view = View::renderWithLayout($view);
     }
 }
