@@ -9,7 +9,7 @@ class View
      * @param array $params
      * @return string
      */
-    private static function render(string $view, array $params): string
+    public static function render(string $view, array $params): string
     {
 
         foreach ($params as $key => $value) {

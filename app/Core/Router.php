@@ -147,7 +147,7 @@ class Router
         $callback = self::$ROUTES[$method][$uri] ?? null;
 
         if (!$callback) {
-            throw new RouteNotFoundException(view: View::renderWithLayout("404"));
+            throw new RouteNotFoundException();
         }
 
         $callbackResponse = call_user_func($callback, $request);

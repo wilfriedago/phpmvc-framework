@@ -18,7 +18,8 @@
   "require": {
     "vlucas/phpdotenv": "^5.5",
     "predis/predis": "^2.0",
-    "ext-curl": "*"
+    "ext-curl": "*",
+    "ext-pdo": "*"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "^3.7",
