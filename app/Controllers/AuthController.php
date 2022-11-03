@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controllers;
 
 use App\Core\Controller;
@@ -44,7 +46,7 @@ class AuthController extends Controller
 
 
             if (!$validator->validate()) {
-                return (new Response())->json($validator->errors)->setStatus(403);
+                return (new Response())->json($validator->errors)->setStatus(400);
             }
 
             // return (new Response())->json(["success" => "Resource created !"])->setStatus(201);

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 // Helpers here serve as example. Change to suit your needs.
 const VITE_HOST = 'http://127.0.0.1:5173';
 
