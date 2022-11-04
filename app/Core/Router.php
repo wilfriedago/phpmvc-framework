@@ -24,117 +24,80 @@ class Router
     }
 
     /**
-     * Register a new GET route
+     * Register a new GET route with the router.
      *
-     * @param string $path
-     * @param callable|array $callback
-     * @return self
+     * @param string $uri
+     * @param array|string|callable|null $action
+     * @return void
      */
-    public static function get(string $path, callable|array $callback): self
+    public static function get(string $uri, array|string|callable|null $action = null): void
     {
-        self::handle('GET', $path, $callback);
-        return new static();
+        self::handle(new Route($uri, 'GET', $action));
+    }
+
+    /**
+     * Register a new POST route with the router.
+     *
+     * @param string $uri
+     * @param array|string|callable|null $action
+     * @return void
+     */
+    public static function post(string $uri, array|string|callable|null $action = null): void
+    {
+        self::handle(new Route($uri, 'POST', $action));
+    }
+
+    /**
+     * Register a new PUT route with the router.
+     *
+     * @param string $uri
+     * @param array|string|callable|null $action
+     * @return void
+     */
+    public static function put(string $uri, array|string|callable|null $action = null): void
+    {
+        self::handle(new Route($uri, 'PUT', $action));
+    }
+
+    /**
+     * Register a new DELETE route with the router.
+     *
+     * @param string $uri
+     * @param array|string|callable|null $action
+     * @return void
+     */
+    public static function patch(string $uri, array|string|callable|null $action = null): void
+    {
+        self::handle(new Route($uri, 'PATCH', $action));
+    }
+
+    /**
+     * Register a new DELETE route with the router.
+     *
+     * @param string $uri
+     * @param array|string|callable|null $action
+     * @return void
+     */
+    public static function delete(string $uri, array|string|callable|null $action = null): void
+    {
+        self::handle(new Route($uri, 'DELETE', $action));
     }
 
     /**
      * Handle a Route Registration
      *
-     * @param string $method Http method
-     * @param string $uri Http uri
-     * @param callable|array $callback Callback function
+     * @param Route $route
      * @return void
      */
-    private static function handle(string $method, string $uri, callable|array $callback): void
+    private static function handle(Route $route): void
     {
-        if (is_callable($callback)) {
-            self::$ROUTES[$method][$uri] = $callback;
-        }
-
-        if (is_array($callback)) {
-            self::$ROUTES[$method][$uri] = self::resolveCallbackFromArray($callback);
-        }
+        $uri = $route->getUri();
+        $method = $route->getMethod();
+        self::$ROUTES[$method][$uri] = $route;
     }
 
     /**
-     * @param array $callbackArray
-     * @return array
-     */
-    public static function resolveCallbackFromArray(array $callbackArray): array
-    {
-        [$controllerClass, $controllerMethod] = $callbackArray;
-
-        if (class_exists($controllerClass)) {
-            $controllerClass = new $controllerClass();
-
-            if (method_exists($controllerClass, $controllerMethod)) {
-                return [$controllerClass, $controllerMethod];
-            }
-        }
-    }
-
-    /**
-     * Register a new POST route
-     *
-     * @param string $path
-     * @param callable|array $callback
-     * @return self
-     */
-    public static function post(string $path, callable|array $callback): self
-    {
-        self::handle('POST', $path, $callback);
-        return new static();
-    }
-
-    /**
-     * Register a new PUT route
-     *
-     * @param string $path
-     * @param callable|array $callback
-     * @return self
-     */
-    public static function put(string $path, callable|array $callback): self
-    {
-        self::handle('PUT', $path, $callback);
-        return new static();
-    }
-
-    /**
-     * Register a new DELETE route
-     *
-     * @param string $path
-     * @param callable|array $callback
-     * @return self
-     */
-    public static function delete(string $path, callable|array $callback): self
-    {
-        self::handle('DELETE', $path, $callback);
-        return new static();
-    }
-
-    /**
-     * Register a new PATCH route
-     *
-     * @param string $path
-     * @param callable|array $callback
-     * @return self
-     */
-    public static function patch(string $path, callable|array $callback): self
-    {
-        self::handle('PATCH', $path, $callback);
-        return new static();
-    }
-
-    /**
-     * @param string $path
-     * @return static
-     */
-    public static function prefix(string $path): self
-    {
-        return new static();
-    }
-
-    /**
-     * Resolve new Route
+     * Resolve a Route from Http Request
      *
      * @param Request $request
      * @return Response
@@ -142,13 +105,15 @@ class Router
      */
     public function resolve(Request $request): Response
     {
-        $method = $request->getMethod();
         $uri = $request->getUri();
-        $callback = self::$ROUTES[$method][$uri] ?? null;
+        $method = $request->getMethod();
+        $route = self::$ROUTES[$method][$uri] ?? null;
 
-        if (!$callback) {
+        if (!$route) {
             throw new RouteNotFoundException();
         }
+
+        $callback = $route->getCallable();
 
         $callbackResponse = call_user_func($callback, $request);
 
@@ -156,10 +121,28 @@ class Router
     }
 
     /**
-     * @return $this
+     * @param string $prefix
+     * @return Router
      */
-    public function middleware(): self
+    public function prefix(string $prefix): Router
     {
-        return new static();
+        return $this;
+    }
+
+    /**
+     * @param string $version
+     * @param Closure $param
+     * @return void
+     */
+    public static function api(string $version, Closure $param): void
+    {
+    }
+
+    /**
+     * @param string $path
+     * @return void
+     */
+    public function middleware(string $path): void
+    {
     }
 }
