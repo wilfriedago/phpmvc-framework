@@ -7,6 +7,7 @@ namespace App\Core;
 use App\Core\Router;
 use App\Core\Request;
 use App\Core\Response;
+use App\Exceptions\InternalServerErrorException;
 use App\Exceptions\RouteNotFoundException;
 
 /**
@@ -69,6 +70,8 @@ class Application
             $response = $this->router->resolve($request);
         } catch (RouteNotFoundException $error) {
             $response = $this->response->setBody($error->view)->setStatus(404);
+        } catch (InternalServerErrorException $error) {
+            $response = $this->response->setBody($error->view)->setStatus(500);
         }
 
         return $response;
