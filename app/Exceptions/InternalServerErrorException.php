@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Exceptions;
 
 use App\Core\View;
@@ -17,6 +19,6 @@ class InternalServerErrorException extends Exception
     {
         parent::__construct($message, $code, $previous);
 
-        $this->view = View::renderWithLayout($view);
+        $this->view = View::renderWithLayout($view, params: ['message' => $message]);
     }
 }
