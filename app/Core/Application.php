@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-use App\Core\Router;
-use App\Core\Request;
-use App\Core\Response;
 use App\Exceptions\InternalServerErrorException;
 use App\Exceptions\RouteNotFoundException;
 
@@ -22,13 +19,15 @@ class Application
     public Router $router;
     public Request $request;
     public Response $response;
+    public Database $database;
 
-    public function __construct($rootDir)
+    public function __construct(string $rootDir, array $config)
     {
         self::$ROOT_DIR = $rootDir;
         $this->router = new Router();
         $this->request = new Request();
         $this->response = new Response();
+        $this->database = new Database($config['db']);
     }
 
     /**
