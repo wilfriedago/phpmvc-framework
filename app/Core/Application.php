@@ -16,6 +16,7 @@ use App\Exceptions\RouteNotFoundException;
 class Application
 {
     public static string $ROOT_DIR;
+    public static string $MIGRATION_DIR;
     public Router $router;
     public Request $request;
     public Response $response;
@@ -24,6 +25,7 @@ class Application
     public function __construct(array $config)
     {
         self::$ROOT_DIR = $config['rootDir'];
+        self::$MIGRATION_DIR = $config['migrationDir'];
         $this->router = new Router();
         $this->request = new Request();
         $this->response = new Response();
