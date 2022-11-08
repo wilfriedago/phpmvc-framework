@@ -53,8 +53,9 @@ class Application
         $uri = $_SERVER['REQUEST_URI'];
         $headers = getallheaders();
         $body = $_POST;
+        $params = $_GET;
 
-        return new Request($method, $uri, $headers, $body);
+        return new Request($method, $uri, $headers, $body, $params);
     }
 
     /**

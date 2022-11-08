@@ -17,6 +17,7 @@ class Request
     public string $uri;
     public array $headers;
     public array $body;
+    public array $params;
 
     /**
      * Class Request Constructor
@@ -30,12 +31,14 @@ class Request
         string $method = "",
         string $uri = "",
         array $headers = [],
-        array $body = []
+        array $body = [],
+        array $params = []
     ) {
         $this->method = $method;
         $this->uri = $uri;
         $this->headers = $headers;
         $this->body = $body;
+        $this->params = $params;
     }
 
     /**
@@ -91,23 +94,28 @@ class Request
     }
 
     /**
+     * Get a request params
+     *
+     * @return array
+     */
+    public function getParams(): array
+    {
+        foreach ($_GET as $key => $value) {
+            $this->params[$key] = filter_input(INPUT_GET, $key, FILTER_SANITIZE_SPECIAL_CHARS);
+        }
+
+        return $this->params;
+    }
+
+    /**
      * Get the body of a request
      *
      * @return array
      */
     public function getBody(): array
     {
-
-        if ($this->method === 'GET') {
-            foreach ($_GET as $key => $value) {
-                $this->body[$key] = filter_input(INPUT_GET, $key, FILTER_SANITIZE_SPECIAL_CHARS);
-            }
-        }
-
-        if ($this->method === 'POST') {
-            foreach ($_POST as $key => $value) {
-                $this->body[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_SPECIAL_CHARS);
-            }
+        foreach ($_POST as $key => $value) {
+            $this->body[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_SPECIAL_CHARS);
         }
 
         return $this->body;
