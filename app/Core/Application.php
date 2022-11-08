@@ -21,9 +21,9 @@ class Application
     public Response $response;
     public Database $database;
 
-    public function __construct(string $rootDir, array $config)
+    public function __construct(array $config)
     {
-        self::$ROOT_DIR = $rootDir;
+        self::$ROOT_DIR = $config['rootDir'];
         $this->router = new Router();
         $this->request = new Request();
         $this->response = new Response();

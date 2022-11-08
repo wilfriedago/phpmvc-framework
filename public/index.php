@@ -9,9 +9,10 @@ require_once __DIR__ . '/helpers.php'; // Vite's helpers for assets loading !
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../routes/web.php';
 
-Dotenv::createImmutable(dirname(__DIR__))->load();
+Dotenv::createImmutable(dirname(__DIR__))->load(); // Loading environment variables !
 
 $appConfig = [
+    'rootDir' => dirname(__DIR__),
     'db' => [
         'driver' => $_ENV['DB_DRIVER'],
         'host' => $_ENV['DB_HOST'],
@@ -22,5 +23,5 @@ $appConfig = [
     ]
 ];
 
-$App = new Application(dirname(__DIR__), $appConfig);
+$App = new Application($appConfig);
 $App->run();
