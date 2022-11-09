@@ -13,7 +13,7 @@ Dotenv::createImmutable(dirname(__DIR__))->load(); // Loading environment variab
 
 $appConfig = [
     'rootDir' => dirname(__DIR__),
-    'migrationDir' => dirname(__DIR__) . "/database/migrations",
+    'migrationDir' => dirname(__DIR__) . "/database/migrations/",
     'db' => [
         'driver' => $_ENV['DB_DRIVER'],
         'host' => $_ENV['DB_HOST'],
